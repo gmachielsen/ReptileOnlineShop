@@ -13,6 +13,19 @@ from orders.models import Order
 from products.models import Product
 from .models import Cart
 
+
+def cart_detail_api_view(request):
+    cart_obj, new_obj = Cart.objects.new_or_get(request)
+    products = [{
+            "id": x.id,
+            "url": x.get_absolute_url(),
+            "name": x.name,
+            "price": x.price
+            }
+            for x in cart_obj.products.all()]
+    cart_data  = {"products": products, "subtotal": cart_obj.subtotal, "total": cart_obj.total}
+    return JsonResponse(cart_data)
+
 def cart_home(request):
     cart_obj, new_obj = Cart.objects.new_or_get(request)
     return render(request, "carts/home.html", {"cart": cart_obj})
@@ -100,8 +113,4 @@ def checkout_home(request):
 
 
 def checkout_done_view(request):
-    return render(request, "carts/checkout-done.html", {})
-
-
-
     return render(request, "carts/checkout-done.html", {})
